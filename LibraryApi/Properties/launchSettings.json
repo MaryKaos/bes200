@@ -18,7 +18,7 @@
       }
     },
     "LibraryApi": {
-      "commandName": "Project",
+      "commandName": "Docker",
       "launchUrl": "weatherforecast",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
