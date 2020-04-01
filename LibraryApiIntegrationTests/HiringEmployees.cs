@@ -22,7 +22,9 @@ namespace LibraryApiIntegrationTests
         {
             var request = new { name = "Joe", startingSalary = 33000 };
             var response = await Client.PostAsJsonAsync("/employees", request);
+
             var content = await response.Content.ReadAsStringAsync();
+
             Assert.Equal("Hiring Joe starting at $33,000.00 with id of 00000000-0000-0000-0000-000000000000", content);
         }
     }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using LibraryApi.Domain;
+using LibraryApi.Interfaces;
 using LibraryApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,7 +31,7 @@ namespace LibraryApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddTransient<ILookupOnCallDevelopers, MicrosoftTeamsOncallDevLookup>();
             services.AddTransient<IGenerateEmployeeIds, EmployeeIdGenerator>();
             services.AddControllers();
             services.AddDbContext<LibraryDataContext>(options =>
