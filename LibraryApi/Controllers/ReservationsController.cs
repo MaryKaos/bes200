@@ -1,6 +1,8 @@
 ﻿using LibraryApi.Domain;
+using LibraryApi.Interfaces;
 using LibraryApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +13,12 @@ namespace LibraryApi.Controllers
     public class ReservationsController : Controller
     {
         LibraryDataContext Context;
+        IWriteToTheReservationQueue ReservationQueue;
 
-        public ReservationsController(LibraryDataContext context)
+        public ReservationsController(LibraryDataContext context, IWriteToTheReservationQueue reservationQueue)
         {
             Context = context;
+            ReservationQueue = reservationQueue;
         }
 
         [HttpPost("/reservations")]
@@ -32,10 +36,42 @@ namespace LibraryApi.Controllers
             Context.Reservations.Add(reservation);
             await Context.SaveChangesAsync();
 
-            //write message to queue
+            //write message to queue (RabbitMQ)
+            await ReservationQueue.Write(reservation);
+
+
             // return response
             return Ok(reservation);
         }
 
+        [HttpGet("/reservations/approved")]
+        public async Task<ActionResult> GetApprovedReservations()
+        {
+            var response = await Context.Reservations
+            .Where(r => r.Status == ReservationStatus.Approved)
+            .ToListAsync();
+            // TODO: Project these into models. This is not a great way to do it. Classroom only.
+            return Ok(response);
+        }
+
+        [HttpGet("/reservations/cancelled")]
+        public async Task<ActionResult> GetCancelledReservations()
+        {
+            var response = await Context.Reservations
+            .Where(r => r.Status == ReservationStatus.Cancelled)
+            .ToListAsync();
+            // TODO: Project these into models. This is not a great way to do it. Classroom only.
+            return Ok(response);
+        }
+
+        [HttpGet("/reservations/pending")]
+        public async Task<ActionResult> GetPendingReservations()
+        {
+            var response = await Context.Reservations
+            .Where(r => r.Status == ReservationStatus.Pending)
+            .ToListAsync();
+            // TODO: Project these into models. This is not a great way to do it. Classroom only.
+            return Ok(response);
+        }
     }
 }
